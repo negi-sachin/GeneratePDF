@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML TO PDF</title>
+    <title>Generate PDF</title>
     <!-- CSS only -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -31,15 +31,12 @@
 
     <!-- Create the Quill editor container -->
     <div id="editor">
-        <p>Hello World!</p>
-        <p>Some initial <strong>bold</strong> text</p>
     </div>
     <div class="text-center mt-3">
         <label for="filename">File Name:</label>
         <input type="text" placeholder="Enter name of your pdf" id="filename" />
     </div>
-    <p class="status alert alert-info mt-3 text-center" id="status"></p>
-    <button class="save btn btn-primary d-block mx-auto w-50 mt-4">Download</button>
+    <button class="save btn btn-info d-block mx-auto w-50 mt-3">Download</button>
 
 
 
@@ -49,11 +46,9 @@
 
     <!-- Initialize Quill editor -->
     <script>
-          document.getElementById("status").style.display = "none";
+        // document.getElementById("status").style.display = "none";
         var toolbarOptions = [
             ['bold', 'italic', 'underline', 'strike'], // toggled buttons
-            ['blockquote', 'code-block'],
-
             [{
                 'header': 1
             }, {
@@ -84,7 +79,7 @@
             [{
                 'header': [1, 2, 3, 4, 5, 6, false]
             }],
-            ['link', 'image', 'video', 'formula'], // add's image support
+            ['link', 'image'], // add's image support
             [{
                 'color': []
             }, {
@@ -100,30 +95,27 @@
             ['clean'] // remove formatting button
         ];
         var options = {
-            //   debug: 'info',
-            modules: {
-                //syntax:true,
+                       modules: {
                 toolbar: toolbarOptions
             },
-            placeholder: 'Compose an epic...',
-            //   readOnly: false,
+            placeholder: 'Write Something.......',
             theme: 'snow'
         };
         var quill = new Quill('#editor', options);
 
         $('.save').click((e) => {
             e.preventDefault()
-            document.getElementById("status").style.display = "block";
-            $('.status').text('Sending Request...')
+            $('.save').text('Please Wait....')
+            $('.save').prop('disabled', true)
             console.log(quill.container.firstChild.innerHTML)
             let data = {
                 html: quill.container.firstChild.innerHTML,
                 filename: $('#filename').val() === "" ? "Html2Pdf.pdf" : $('#filename').val() + '.pdf'
             }
-            console.log(data)
+           // console.log(data)
             async function fetchData() {
                 let body = {
-                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
@@ -132,14 +124,18 @@
                 }
                 await fetch(window.location.href, body)
                     .then(res => {
-                        console.log(res)
-                        return res.json();
-                    })
-                    .then(res => {
-                        console.log(res)
-                        if (res.status === "okay") {
+                       // console.log(res)
+                        if (res.status === 200) {
                             window.location.href = "/download"
-                            $('.status').text('Downloading...')
+                            $('.save').text('Done')
+                            setTimeout(() => {
+                                $('.save').text('Download')
+                                $('.save').prop('disabled', false)
+                            }, 3000);
+                        } else {
+                            alert("Something Went Wrong .Please Try again !!")
+                            $('.save').text('Download')
+                            $('.save').prop('disabled', false)
                         }
                     })
             }

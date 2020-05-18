@@ -30,10 +30,16 @@ app.post("/", (req, res) => {
       },
       printBackground: true,
     });
-    res.json({ status: "okay" });
+    res.sendStatus(200)
     browser.close();
   }
-  Conversion();
+  try{
+    Conversion();
+  }
+  catch(e){
+    console.log(e)
+    res.sendStatus(400)
+  }
 });
 
 app.get("/download", (req, res) => {
